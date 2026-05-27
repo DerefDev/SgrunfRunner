@@ -1,0 +1,115 @@
+{
+  "frames": {
+    "OstacoliCyberpunk1": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 62,
+        "h": 39
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 62,
+        "h": 39
+      },
+      "sourceSize": {
+        "w": 62,
+        "h": 39
+      }
+    },
+    "OstacoliCyberpunk2": {
+      "frame": {
+        "x": 62,
+        "y": 0,
+        "w": 45,
+        "h": 50
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 45,
+        "h": 50
+      },
+      "sourceSize": {
+        "w": 45,
+        "h": 50
+      }
+    },
+    "OstacoliCyberpunk3": {
+      "frame": {
+        "x": 107,
+        "y": 0,
+        "w": 32,
+        "h": 19
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 19
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 19
+      }
+    },
+    "OstacoliCyberpunk4": {
+      "frame": {
+        "x": 139,
+        "y": 0,
+        "w": 48,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      }
+    },
+    "Drone": {
+      "frame": {
+        "x": 187,
+        "y": 0,
+        "w": 54,
+        "h": 47
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 54,
+        "h": 47
+      },
+      "sourceSize": {
+        "w": 54,
+        "h": 47
+      }
+    }
+  },
+  "meta": {
+    "app": "Sprite Sheet Maker",
+    "version": "1.0",
+    "image": "OstacoliCyberpunk_Spritesheet.webp",
+    "format": "RGBA8888",
+    "size": {
+      "w": 241,
+      "h": 50
+    },
+    "scale": "1"
+  }
+}

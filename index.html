@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sgrunf - Seleziona Avventura</title>
+    <link rel="stylesheet" href="split.css">
+</head>
+<body>
+
+    <div class="split-container">
+        
+        <div class="split-tile split-left" id="tile-fantasy">
+            <img src="./assets/sfondoFantasy.png" class="static-bg" alt="Sfondo Fantasy">
+            <img src="./assets/SgrunfFantasy_Statico.png" class="character-sprite" alt="Sgrunf Fantasy">
+
+            <video
+                src="./assets/FantasyVideo.mp4"
+                poster="./assets/sfondoFantasy.png"
+                class="video-preview"
+                loop muted playsinline preload="auto">
+            </video>
+            
+            <div class="content-overlay">
+                <h1>SGRUNF FANTASY</h1>
+                <p>Sopravvivi all'ombra oscura</p>
+            </div>
+        </div>
+
+        <div class="split-tile split-right locked" id="cyberpunk-section">
+            
+            <div class="lock-screen" id="lock-screen">
+                <h2>PASSWORD</h2>
+                <p>Inserisci codice per il portale</p>
+                <input type="password" id="secret-input" placeholder="DIGITA QUI...">
+            </div>
+
+            <div class="secret-content" id="tile-cyberpunk">
+                <img src="./assets/sfondoCyberpunk.png" class="static-bg" alt="Sfondo Cyberpunk">
+                <img src="./assets/SgrunfCyberPunk_Statico.png" class="character-sprite" alt="Sgrunf Cyberpunk">
+
+                <video
+                    src="./assets/CyberpunkVideo.mp4"
+                    poster="./assets/sfondoCyberpunk.png"
+                    class="video-preview"
+                    loop muted playsinline preload="auto" >
+                </video>
+                
+                <div class="content-overlay">
+                    <h1>SGRUNF CYBERPUNK</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="split.js" defer></script>
+</body>
+</html>

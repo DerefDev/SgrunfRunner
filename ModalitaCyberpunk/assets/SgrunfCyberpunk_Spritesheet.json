@@ -1,0 +1,275 @@
+{
+  "frames": {
+    "SgrunfCyberPunk_Statico": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 124
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 106,
+        "h": 124
+      },
+      "sourceSize": {
+        "w": 106,
+        "h": 124
+      }
+    },
+    "SgrunfCyberPunk_Corsa1": {
+      "frame": {
+        "x": 106,
+        "y": 0,
+        "w": 86,
+        "h": 122
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 86,
+        "h": 122
+      },
+      "sourceSize": {
+        "w": 86,
+        "h": 122
+      }
+    },
+    "SgrunfCyberPunk_Corsa2": {
+      "frame": {
+        "x": 192,
+        "y": 0,
+        "w": 88,
+        "h": 120
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 120
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 120
+      }
+    },
+    "SgrunfCyberPunk_Corsa3": {
+      "frame": {
+        "x": 280,
+        "y": 0,
+        "w": 88,
+        "h": 124
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 124
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 124
+      }
+    },
+    "SgrunfCyberPunk_Corsa4": {
+      "frame": {
+        "x": 368,
+        "y": 0,
+        "w": 92,
+        "h": 122
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 92,
+        "h": 122
+      },
+      "sourceSize": {
+        "w": 92,
+        "h": 122
+      }
+    },
+    "SgrunfCyberPunk_Corsa5": {
+      "frame": {
+        "x": 460,
+        "y": 0,
+        "w": 92,
+        "h": 122
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 92,
+        "h": 122
+      },
+      "sourceSize": {
+        "w": 92,
+        "h": 122
+      }
+    },
+    "SgrunfCyberPunk_Corsa6": {
+      "frame": {
+        "x": 552,
+        "y": 0,
+        "w": 86,
+        "h": 122
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 86,
+        "h": 122
+      },
+      "sourceSize": {
+        "w": 86,
+        "h": 122
+      }
+    },
+    "SgrunfCyberPunk_Salto1": {
+      "frame": {
+        "x": 638,
+        "y": 0,
+        "w": 110,
+        "h": 122
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 110,
+        "h": 122
+      },
+      "sourceSize": {
+        "w": 110,
+        "h": 122
+      }
+    },
+    "SgrunfCyberPunk_Salto2": {
+      "frame": {
+        "x": 748,
+        "y": 0,
+        "w": 116,
+        "h": 114
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 116,
+        "h": 114
+      },
+      "sourceSize": {
+        "w": 116,
+        "h": 114
+      }
+    },
+    "SgrunfCyberPunk_Salto3": {
+      "frame": {
+        "x": 864,
+        "y": 0,
+        "w": 88,
+        "h": 114
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 88,
+        "h": 114
+      },
+      "sourceSize": {
+        "w": 88,
+        "h": 114
+      }
+    },
+    "SgrunfCyberpunkMorte1": {
+      "frame": {
+        "x": 952,
+        "y": 0,
+        "w": 112,
+        "h": 110
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 112,
+        "h": 110
+      },
+      "sourceSize": {
+        "w": 112,
+        "h": 110
+      }
+    },
+    "SgrunfCyberpunkMorte2": {
+      "frame": {
+        "x": 1064,
+        "y": 0,
+        "w": 116,
+        "h": 112
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 116,
+        "h": 112
+      },
+      "sourceSize": {
+        "w": 116,
+        "h": 112
+      }
+    },
+    "SgrunfCyberpunkMorte3": {
+      "frame": {
+        "x": 1180,
+        "y": 0,
+        "w": 108,
+        "h": 100
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 108,
+        "h": 100
+      },
+      "sourceSize": {
+        "w": 108,
+        "h": 100
+      }
+    }
+  },
+  "meta": {
+    "app": "Sprite Sheet Maker",
+    "version": "1.0",
+    "image": "SgrunfCyberpunk_Spritesheet.webp",
+    "format": "RGBA8888",
+    "size": {
+      "w": 1288,
+      "h": 124
+    },
+    "scale": "1"
+  }
+}

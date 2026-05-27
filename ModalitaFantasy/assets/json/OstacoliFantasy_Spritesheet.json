@@ -1,0 +1,75 @@
+{
+  "frames": {
+    "OstacoloFantasy1": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 89,
+        "h": 58
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 89,
+        "h": 58
+      },
+      "sourceSize": {
+        "w": 89,
+        "h": 58
+      }
+    },
+    "OstacoloFantasy2": {
+      "frame": {
+        "x": 89,
+        "y": 0,
+        "w": 33,
+        "h": 56
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 33,
+        "h": 56
+      },
+      "sourceSize": {
+        "w": 33,
+        "h": 56
+      }
+    },
+    "OstacoloFantasy3": {
+      "frame": {
+        "x": 122,
+        "y": 0,
+        "w": 57,
+        "h": 93
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 57,
+        "h": 93
+      },
+      "sourceSize": {
+        "w": 57,
+        "h": 93
+      }
+    }
+  },
+  "meta": {
+    "app": "Sprite Sheet Maker",
+    "version": "1.0",
+    "image": "spritesheet.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 179,
+      "h": 93
+    },
+    "scale": "1"
+  }
+}

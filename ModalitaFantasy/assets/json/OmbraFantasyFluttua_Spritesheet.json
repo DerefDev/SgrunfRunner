@@ -1,0 +1,155 @@
+{
+  "frames": {
+    "OmbraFantasyFluttua_1": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 78,
+        "h": 118
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 78,
+        "h": 118
+      },
+      "sourceSize": {
+        "w": 78,
+        "h": 118
+      }
+    },
+    "OmbraFantasyFluttua_2": {
+      "frame": {
+        "x": 78,
+        "y": 0,
+        "w": 82,
+        "h": 118
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 82,
+        "h": 118
+      },
+      "sourceSize": {
+        "w": 82,
+        "h": 118
+      }
+    },
+    "OmbraFantasyFluttua_3": {
+      "frame": {
+        "x": 160,
+        "y": 0,
+        "w": 90,
+        "h": 124
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 90,
+        "h": 124
+      },
+      "sourceSize": {
+        "w": 90,
+        "h": 124
+      }
+    },
+    "OmbraFantasyFluttua_4": {
+      "frame": {
+        "x": 250,
+        "y": 0,
+        "w": 98,
+        "h": 124
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 98,
+        "h": 124
+      },
+      "sourceSize": {
+        "w": 98,
+        "h": 124
+      }
+    },
+    "OmbraFantasyFluttua_5": {
+      "frame": {
+        "x": 348,
+        "y": 0,
+        "w": 98,
+        "h": 120
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 98,
+        "h": 120
+      },
+      "sourceSize": {
+        "w": 98,
+        "h": 120
+      }
+    },
+    "OmbraFantasyFluttua_6": {
+      "frame": {
+        "x": 446,
+        "y": 0,
+        "w": 108,
+        "h": 118
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 108,
+        "h": 118
+      },
+      "sourceSize": {
+        "w": 108,
+        "h": 118
+      }
+    },
+    "OmbraFantasyFluttua_7": {
+      "frame": {
+        "x": 554,
+        "y": 0,
+        "w": 82,
+        "h": 120
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 82,
+        "h": 120
+      },
+      "sourceSize": {
+        "w": 82,
+        "h": 120
+      }
+    }
+  },
+  "meta": {
+    "app": "Sprite Sheet Maker",
+    "version": "1.0",
+    "image": "spritesheet.png",
+    "format": "RGBA8888",
+    "size": {
+      "w": 636,
+      "h": 124
+    },
+    "scale": "1"
+  }
+}

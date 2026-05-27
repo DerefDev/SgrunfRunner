@@ -1,0 +1,61 @@
+/* ============================================================
+   CYBERPUNK RUNNER — CSS
+   Layout 16:9 rigido e responsive.
+   Il canvas mantiene proporzioni fisse 1280×720 e si scala
+   in modo da riempire il viewport senza distorsioni.
+   ============================================================ */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  /* Fallback per browser senza supporto dvh */
+  height: 100vh;
+  /* dvh = dynamic viewport height: esclude la UI del browser mobile
+     (barra indirizzi, barra tab). Risolve il taglio del canvas su iOS/Android. */
+  height: 100dvh;
+  background: #00000a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  touch-action: none;
+}
+
+/*
+ * Il canvas ha dimensioni interne 1280×720 (16:9).
+ * Il ridimensionamento CSS mantiene il rapporto senza distorcere.
+ * "object-fit" non si applica ai canvas: si usano max-width/max-height
+ * con aspect-ratio CSS.
+ */
+#gameCanvas {
+  display: block;
+  /* Pixel art: nessun anti-aliasing */
+  image-rendering: pixelated;
+  /* crisp-edges rimosso: su alcuni mobile GPU forza rasterizzazione software */
+  /* will-change: transform suggerisce al browser di promuovere il canvas
+     a layer compositing dedicato, riducendo il re-paint ad ogni frame */
+  will-change: transform;
+  /* Mantieni aspect ratio 16:9 via CSS */
+  aspect-ratio: 16 / 9;
+  width: 100vw;
+  height: auto;
+  max-width: 100vw;
+  /* Fallback vh + dvh per escludere la UI del browser mobile */
+  max-height: 100vh;
+  max-height: 100dvh;
+  object-fit: contain;
+}
+
+/* Su schermi più alti che larghi (portrait) adatta in altezza */
+@media (max-aspect-ratio: 16/9) {
+  #gameCanvas {
+    width: auto;
+    height: 100vh;
+    height: 100dvh;
+  }
+}
