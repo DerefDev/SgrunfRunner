@@ -26,7 +26,7 @@ img, .static-bg, .character-sprite {
     flex: 1;
     position: relative;
     overflow: hidden;
-    margin: 10px; 
+    margin: 10px;
     border-radius: 12px;
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), border-color 0.4s, box-shadow 0.4s;
     display: flex;
@@ -62,7 +62,7 @@ img, .static-bg, .character-sprite {
 
 @keyframes float {
     0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
+    50%       { transform: translateY(-10px); }
 }
 
 .content-overlay {
@@ -73,6 +73,8 @@ img, .static-bg, .character-sprite {
     padding: 12px 20px;
     border-radius: 8px;
     width: fit-content;
+    /* Evita che il testo vada a capo */
+    white-space: nowrap;
 }
 
 .split-left { border: 2px solid #2e7d32; }
@@ -83,17 +85,17 @@ img, .static-bg, .character-sprite {
 .split-right .content-overlay { right: 20px; color: #00e5ff; border: 1px solid #d500f9; text-align: right; }
 .split-right .character-sprite { right: 10%; }
 
-/* DESKTOP HOVER */
+/* ─── DESKTOP HOVER ──────────────────────────────────────────────────────── */
 @media (hover: hover) {
     .split-tile:hover .video-preview { opacity: 1; }
     .split-tile:hover .static-bg, .split-tile:hover .character-sprite { opacity: 0; }
     .split-tile:hover { transform: scale(1.03); }
 }
 
-/* LOCK SCREEN */
+/* ─── LOCK SCREEN ────────────────────────────────────────────────────────── */
 .split-right.locked { background-color: #0a0b10; border: 2px dashed #ff0055; justify-content: center; align-items: center; }
 .split-right.locked .secret-content { display: none; }
-.split-right.unlocked .lock-screen { display: none; }
+.split-right.unlocked .lock-screen  { display: none; }
 
 .lock-screen {
     z-index: 10;
@@ -105,7 +107,12 @@ img, .static-bg, .character-sprite {
     background: rgba(13, 14, 22, 0.95);
     border: 1px solid #ff0055;
     border-radius: 8px;
+    width: min(80%, 260px);
+    box-sizing: border-box;
 }
+
+.lock-screen h2,
+.lock-screen p { white-space: nowrap; }
 
 .lock-screen input {
     padding: 10px;
@@ -115,33 +122,66 @@ img, .static-bg, .character-sprite {
     text-align: center;
     text-transform: uppercase;
     width: 100%;
+    box-sizing: border-box;
 }
 
-/* ─── PORTRAIT (mobile verticale): colonne impilate ─────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYOUT: width > height  →  affiancato (default, nessun media query)
+            height > width →  impilato   (portrait)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── PORTRAIT: height > width → impilato ───────────────────────────────── */
 @media (orientation: portrait) {
     .split-container { flex-direction: column; }
-    .split-tile { height: 45dvh; margin: 5px 0; }
+    .split-tile      { height: 45dvh; margin: 5px 0; }
 
     /* Disabilita video su mobile per evitare schermi neri */
     .video-preview { display: none !important; }
     .static-bg, .character-sprite { opacity: 1 !important; }
-
-    /* Font compatto per non andare a capo */
-    .content-overlay       { padding: 8px 12px; top: 16px; }
-    .content-overlay h1    { font-size: 0.8rem; margin: 0 0 2px; letter-spacing: 0.08em; }
-    .content-overlay p     { font-size: 0.65rem; margin: 0; }
-    .lock-screen           { padding: 14px 16px; gap: 6px; }
-    .lock-screen h2        { font-size: 0.8rem; margin: 0; }
-    .lock-screen p         { font-size: 0.65rem; margin: 0; }
-    .lock-screen input     { font-size: 0.75rem; padding: 7px; }
 }
 
-/* ─── LANDSCAPE SU SCHERMI PICCOLI (telefono ruotato): side-by-side ─────── */
-/* Nessuna regola extra: il layout di default è già flex-row */
+/* ─── FONT SCALING: schermi stretti in portrait ──────────────────────────── */
+
+/* Smartphone medio (≤ 430 px larghezza) */
+@media (orientation: portrait) and (max-width: 430px) {
+    .content-overlay    { padding: 6px 10px; top: 12px; }
+    .content-overlay h1 { font-size: 0.72rem; margin: 0 0 2px; letter-spacing: 0.05em; }
+    .content-overlay p  { font-size: 0.6rem;  margin: 0; }
+    .lock-screen        { padding: 10px 12px; gap: 5px; }
+    .lock-screen h2     { font-size: 0.72rem; margin: 0; }
+    .lock-screen p      { font-size: 0.6rem;  margin: 0; }
+    .lock-screen input  { font-size: 0.7rem;  padding: 6px; }
+}
+
+/* Smartphone piccolo (≤ 360 px larghezza) */
+@media (orientation: portrait) and (max-width: 360px) {
+    .content-overlay    { padding: 5px 8px; top: 10px; }
+    .content-overlay h1 { font-size: 0.62rem; letter-spacing: 0.03em; }
+    .content-overlay p  { font-size: 0.54rem; }
+    .lock-screen        { padding: 8px 10px; gap: 4px; }
+    .lock-screen h2     { font-size: 0.62rem; }
+    .lock-screen p      { font-size: 0.54rem; }
+    .lock-screen input  { font-size: 0.62rem; padding: 5px; }
+}
+
+/* ─── LANDSCAPE su telefoni (width > height ma schermo piccolo) ──────────── */
 @media (orientation: landscape) and (max-height: 500px) {
-    /* Tile più strette su telefoni landscape per non tagliare il contenuto */
-    .content-overlay h1 { font-size: 0.78rem; letter-spacing: 0.06em; }
-    .content-overlay p  { font-size: 0.62rem; }
-    .lock-screen h2     { font-size: 0.78rem; }
-    .lock-screen p      { font-size: 0.62rem; }
+    .split-tile         { margin: 6px; }
+    .content-overlay    { padding: 6px 10px; top: 12px; }
+    .content-overlay h1 { font-size: 0.72rem; letter-spacing: 0.05em; margin: 0 0 2px; }
+    .content-overlay p  { font-size: 0.58rem; margin: 0; }
+    .lock-screen        { padding: 10px 12px; gap: 5px; }
+    .lock-screen h2     { font-size: 0.72rem; margin: 0; }
+    .lock-screen p      { font-size: 0.58rem; margin: 0; }
+    .lock-screen input  { font-size: 0.68rem; padding: 6px; }
+}
+
+/* Telefono landscape molto basso (≤ 380 px altezza) */
+@media (orientation: landscape) and (max-height: 380px) {
+    .content-overlay    { padding: 4px 8px; top: 8px; }
+    .content-overlay h1 { font-size: 0.62rem; }
+    .content-overlay p  { font-size: 0.52rem; }
+    .lock-screen h2     { font-size: 0.62rem; }
+    .lock-screen p      { font-size: 0.52rem; }
+    .lock-screen input  { font-size: 0.6rem; padding: 4px; }
 }
