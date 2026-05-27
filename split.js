@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateLayout() {
         const useRow = window.innerWidth > window.innerHeight;
         splitContainer.style.flexDirection = useRow ? 'row' : 'column';
+        splitContainer.classList.toggle('is-row', useRow);
+        splitContainer.classList.toggle('is-col', !useRow);
     }
 
     updateLayout();
