@@ -1382,6 +1382,9 @@ function disegnaStartScreen() {
       CW / 2, CH - 20, '#886600', 16, 'center', 5
     );
   }
+
+  // Crediti autori
+  testoNeon('by Lorenzo Federici & Giovanni Fabrizi', CW / 2, CH - 18, '#99ddf1', 14, 'center', 3);
 }
 
 /** Schermata Game Over */
@@ -1407,6 +1410,9 @@ function disegnaGameOver() {
   }
 
   testoNeon('TOCCA  o  SPAZIO  per riprovare', CW / 2, CH / 2 + 130, '#00e5ff', 20, 'center', 10);
+
+  // Crediti autori
+  testoNeon('by Lorenzo Federici & Giovanni Fabrizi', CW / 2, CH - 18, '#99ddf1', 14, 'center', 3);
 }
 
 /** Schermata di caricamento con barra progresso */
