@@ -1,18 +1,19 @@
 # SgrunfRunner
 
-> An endless runner web game developed for SarnanoComix.
->
-> https://derefdev.github.io/SgrunfRunner
+An endless runner web game developed for SarnanoComix.
+
+[Play now on Github Pages](https://derefdev.github.io/SgrunfRunner)
 
 ![Last commit](https://img.shields.io/github/last-commit/DerefDev/SgrunfRunner?style=for-the-badge&logo=github) ![License](https://img.shields.io/badge/license-GPL-green?style=for-the-badge)
 
 ## 📑 Table of Contents
 
-- [Description](#description)
-- [Key Features](#key-features)
-- [Use Cases](#use-cases)
-- [Project Structure](#project-structure)
-- [License](#license)
+- [Description](#-description)
+- [Key Features](#-key-features)
+- [Use Cases](#-use-cases)
+- [Project Structure](#-project-structure)
+- [Credits](#-credits)
+- [License](#-license)
 
 ## 📝 Description
 
@@ -95,6 +96,17 @@ SgrunfRunner is a browser-based endless runner game designed specifically for th
 ├── split.css
 └── split.js
 ```
+
+## 📥 Credits
+
+Some visual assets used in this project are based on or derived from the following asset packs:
+
+- [Warped City — by Ansimuz](https://ansimuz.itch.io/warped-city)
+- [Night City — by Stext25](https://stext25.itch.io/night-city)
+- [Ancient Forest — by Sismodyn](https://sismodyn.itch.io/ancientforest)
+
+All rights to the original assets belong to their respective creators.  
+Assets may have been modified or adapted for this project.
 
 ## 📜 License
 
