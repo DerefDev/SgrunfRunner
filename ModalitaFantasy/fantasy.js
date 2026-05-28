@@ -18,7 +18,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
      - salvataggio punteggio in memoria (aggiorna DEV_LEADERBOARD)
    Impostare a false prima del deploy in produzione.
    ============================================================ */
-const DEV_MODE = true;
+const DEV_MODE = false;
 
 /** Classifica fittizia per il test locale */
 const DEV_LEADERBOARD = [
