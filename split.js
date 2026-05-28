@@ -1,4 +1,4 @@
-const PASSWORD_CORRETTA = "FUTURO";
+const PASSWORD_CORRETTA = "FUTUR0";
 
 document.addEventListener('DOMContentLoaded', () => {
     const fantasyTile = document.getElementById('tile-fantasy');
