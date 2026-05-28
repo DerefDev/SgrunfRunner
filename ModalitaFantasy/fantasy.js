@@ -1,6 +1,133 @@
 'use strict';
 
 /* ============================================================
+   SUPABASE — CONFIGURAZIONE
+   Sostituire i valori con le credenziali del proprio progetto.
+   ============================================================ */
+const SUPABASE_URL      = 'https://mzoakzthrslqkdrxhhxl.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im16b2FrenRocnNscWtkcnhoaHhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5NTY1ODAsImV4cCI6MjA5NTUzMjU4MH0.pemFeQrhh4bsR0cER5nCZpbYH4eHZSDp-xE_Y_xTrgo';
+
+/* ============================================================
+   DEV MODE — stub locale senza database reale
+   -----------------------------------------
+   Impostare DEV_MODE = true per testare in locale senza Supabase.
+   Il client viene sostituito con dati finti in memoria:
+     - utente demo gia' loggato (username: Sgrunf)
+     - classifica con 5 voci di test
+     - login/registrazione sempre riusciti
+     - salvataggio punteggio in memoria (aggiorna DEV_LEADERBOARD)
+   Impostare a false prima del deploy in produzione.
+   ============================================================ */
+const DEV_MODE = true;
+
+/** Classifica fittizia per il test locale */
+const DEV_LEADERBOARD = [
+  { nome: 'Sgrunf',    score: 1420, user_id: 'dev-001' },
+  { nome: 'Gandalf',   score:  980, user_id: 'dev-002' },
+  { nome: 'Elrond',    score:  760, user_id: 'dev-003' },
+  { nome: 'Gimli',     score:  540, user_id: 'dev-004' },
+  { nome: 'Ospite_77', score:  210, user_id: 'dev-005' },
+];
+
+/** Sessione fittizia — simula un utente gia' autenticato */
+const DEV_FAKE_SESSION = {
+  user: {
+    id: 'dev-001',
+    email: 'sgrunf@sgrunf.game',
+    user_metadata: { username: 'Sgrunf' },
+  },
+};
+
+/**
+ * Costruisce il client Supabase finto usato in DEV_MODE.
+ * Mantiene un registro utenti in memoria per simulare i veri controlli:
+ *   - login fallisce se l'utente non esiste o la password e' sbagliata
+ *   - registrazione fallisce se lo username e' gia' in uso (case-insensitive)
+ *   - username vuoto o password sotto i 6 caratteri vengono rifiutati
+ * Il punteggio salvato aggiorna DEV_LEADERBOARD in memoria.
+ *
+ * Utente demo pre-caricato:
+ *   username: Sgrunf  |  password: demo1234
+ */
+function buildFakeSupabase() {
+  // getSession restituisce null la prima volta: l'overlay auth viene mostrato.
+  // Cosi' si testa il flusso reale di login/registrazione dall'inizio.
+  let _session = null;
+
+  // Registro utenti: { email -> { username, password, id } }
+  // La chiave e' l'email (username@sgrunf.game), ma il controllo duplicati
+  // avviene sullo username in lowercase per evitare varianti tipo Sgrunf/SGRUNF.
+  const _utenti = {
+    'sgrunf@sgrunf.game': { username: 'Sgrunf', password: 'demo1234', id: 'dev-001' },
+  };
+
+  let _idCounter = 100;
+
+  /** Controlla se uno username e' gia' usato (case-insensitive) */
+  function _usernameEsiste(username) {
+    const lower = username.toLowerCase();
+    return Object.values(_utenti).some(u => u.username.toLowerCase() === lower);
+  }
+
+  const auth = {
+    getSession: async () => ({ data: { session: _session }, error: null }),
+
+    signInWithPassword: async ({ email, password }) => {
+      const utente = _utenti[email];
+      if (!utente) {
+        return { data: null, error: { message: 'User not found' } };
+      }
+      if (utente.password !== password) {
+        return { data: null, error: { message: 'Invalid password' } };
+      }
+      _session = { user: { id: utente.id, email, user_metadata: { username: utente.username } } };
+      return { data: { session: _session }, error: null };
+    },
+
+    signUp: async ({ email, password, options }) => {
+      const username = (options && options.data && options.data.username) || email.replace('@sgrunf.game', '');
+
+      // Username gia' in uso (confronto case-insensitive, come farebbe Supabase con email univoca)
+      if (_utenti[email] || _usernameEsiste(username)) {
+        return { data: null, error: { message: 'User already registered' } };
+      }
+
+      const id = 'dev-' + (++_idCounter);
+      _utenti[email] = { username, password, id };
+      _session = { user: { id, email, user_metadata: { username } } };
+      return { data: { session: _session }, error: null };
+    },
+
+    signOut: async () => { _session = null; return { error: null }; },
+  };
+
+  const from = (_table) => ({
+    select: (_cols) => ({
+      order: () => ({
+        limit: async () => {
+          const rows = [...DEV_LEADERBOARD].sort((a, b) => b.score - a.score).slice(0, 10);
+          return { data: rows, error: null };
+        },
+      }),
+      eq: (_col, val) => ({
+        maybeSingle: async () => {
+          const row = DEV_LEADERBOARD.find(r => r.user_id === val) || null;
+          return { data: row, error: null };
+        },
+      }),
+    }),
+    upsert: async (row) => {
+      const idx = DEV_LEADERBOARD.findIndex(r => r.user_id === row.user_id);
+      if (idx >= 0) DEV_LEADERBOARD[idx] = Object.assign({}, DEV_LEADERBOARD[idx], row);
+      else DEV_LEADERBOARD.push(row);
+      return { data: row, error: null };
+    },
+  });
+
+  return { auth, from };
+}
+
+/* ============================================================
    SGRUNF FANTASY RUNNER
    Missione 8 — L'Arcade Segreto di Sgrunf
    Sarnano Comix Quest — Compagnia di Sottomonte
@@ -198,6 +325,313 @@ const CONFIG = {
 
 /** Percorso cartella suoni */
 const SOUND_PATH = ASSET_PATH + 'sounds/';
+
+/* ============================================================
+   SUPABASE — CLIENT, SESSIONE E CLASSIFICA
+   ============================================================ */
+
+/** Istanza del client Supabase (inizializzata in initSupabase()) */
+let supabase = null;
+
+/** Sessione Supabase corrente (null = ospite o non autenticato) */
+let sessioneCorrente = null;
+
+/**
+ * Dati classifica: array di { pos, nome, score, user_id } o null se non caricati.
+ * Condiviso tra START e GAMEOVER.
+ */
+let classificaDati = null;
+let classificaStato = 'idle'; // 'idle' | 'loading' | 'ok' | 'error'
+
+/**
+ * Inizializza il client Supabase usando la libreria caricata via CDN (ESM).
+ * Viene chiamata prima di caricaAsset() nel bootstrap.
+ */
+async function initSupabase() {
+  if (DEV_MODE) {
+    supabase = buildFakeSupabase();
+    console.info('[DEV] Supabase stub attivo — nessuna chiamata reale al database.');
+    return;
+  }
+  try {
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm');
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch (e) {
+    console.warn('[Supabase] impossibile inizializzare:', e);
+  }
+}
+
+/**
+ * Carica la top-10 dalla tabella leaderboard_fantasy.
+ * Aggiorna classificaDati e classificaStato in modo asincrono.
+ */
+async function caricaClassifica() {
+  if (!supabase) { classificaStato = 'error'; return; }
+  classificaStato = 'loading';
+  try {
+    const { data, error } = await supabase
+      .from('leaderboard_fantasy')
+      .select('nome, score, user_id')
+      .order('score', { ascending: false })
+      .limit(10);
+    if (error) throw error;
+    classificaDati = (data || []).map((r, i) => ({ pos: i + 1, ...r }));
+    classificaStato = 'ok';
+  } catch (e) {
+    console.warn('[Supabase] caricaClassifica:', e);
+    classificaStato = 'error';
+  }
+}
+
+/**
+ * Salva il punteggio se supera il record precedente (upsert by user_id).
+ * Silenzioso: errori solo in console.
+ * @param {number} score - Math.floor(punteggio)
+ */
+async function salvaPunteggio(score) {
+  if (!supabase || !sessioneCorrente) return;
+  try {
+    // Recupera record attuale
+    const { data: existing } = await supabase
+      .from('leaderboard_fantasy')
+      .select('score')
+      .eq('user_id', sessioneCorrente.user.id)
+      .maybeSingle();
+    if (existing && existing.score >= score) return; // nessun miglioramento
+    await supabase.from('leaderboard_fantasy').upsert({
+      user_id: sessioneCorrente.user.id,
+      nome:    sessioneCorrente.user.user_metadata.username,
+      score,
+      data:    Date.now(),
+    }, { onConflict: 'user_id' });
+  } catch (e) {
+    console.warn('[Supabase] salvaPunteggio:', e);
+  }
+}
+
+/**
+ * Disegna la classifica sul canvas nell'area indicata.
+ * @param {number} x        - X centro colonna posizione
+ * @param {number} yInizio  - Y prima riga
+ * @param {number} rigaH    - altezza di ogni riga in px
+ */
+function disegnaClassifica(x, yInizio, rigaH) {
+  const coloriPodio = ['#ffd700', '#c0c0c0', '#cd7f32'];
+
+  if (classificaStato === 'loading') {
+    testoFantasy('Caricamento classifica...', x, yInizio, '#b89a5a', 16, 'center', 4);
+    return;
+  }
+  if (classificaStato === 'error' || !classificaDati) {
+    testoFantasy('Classifica non disponibile', x, yInizio, '#886650', 16, 'center', 4);
+    return;
+  }
+  if (classificaDati.length === 0) {
+    testoFantasy('Nessun punteggio registrato', x, yInizio, '#886650', 16, 'center', 4);
+    return;
+  }
+
+  testoFantasy('✦ CLASSIFICA ✦', x, yInizio, '#ffd700', 18, 'center', 10);
+
+  const mioId = sessioneCorrente ? sessioneCorrente.user.id : null;
+
+  classificaDati.forEach((r, i) => {
+    const y  = yInizio + rigaH + i * rigaH;
+    const isMio = r.user_id === mioId;
+    const col = i < 3 ? coloriPodio[i] : (isMio ? '#a0e0ff' : '#c8b880');
+
+    // Sfondo riga giocatore corrente
+    if (isMio) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(80,160,255,0.12)';
+      ctx.fillRect(x - 280, y - rigaH + 4, 560, rigaH);
+      ctx.restore();
+    }
+
+    const nome  = (r.nome || 'Anonimo').substring(0, 14);
+    const score = String(r.score).padStart(5, '0');
+    testoFantasy(`${r.pos}.`, x - 270, y, col, 15, 'left', isMio ? 8 : 3);
+    testoFantasy(nome,        x - 240, y, col, 15, 'left', isMio ? 8 : 3);
+    testoFantasy(score,       x + 260, y, col, 15, 'right', isMio ? 8 : 3);
+  });
+}
+
+/* ============================================================
+   OVERLAY AUTH (HTML puro sopra il canvas)
+   ============================================================ */
+
+/**
+ * Crea e mostra l'overlay HTML di autenticazione.
+ * L'overlay viene rimosso quando l'utente sceglie un'azione.
+ * @param {Function} onStart - callback chiamata quando si può avviare START
+ */
+function mostraOverlayAuth(onStart) {
+  // Rimuovi overlay precedente se esiste
+  const old = document.getElementById('auth-overlay');
+  if (old) old.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = 'auth-overlay';
+
+  overlay.innerHTML = `
+    <div class="auth-box">
+      <h1 class="auth-title">SGRUNF<br><span>Fantasy Runner</span></h1>
+
+      <!-- Schermata selezione -->
+      <div id="auth-scelta">
+        <button class="auth-btn auth-btn-primary" id="btn-vai-login">⚔ Accedi</button>
+        <button class="auth-btn auth-btn-secondary" id="btn-vai-registra">✦ Registrati</button>
+        <button class="auth-btn auth-btn-ghost" id="btn-ospite">Entra come Ospite</button>
+      </div>
+
+      <!-- Form Login -->
+      <div id="auth-login" class="auth-form" style="display:none">
+        <h2 class="auth-form-title">Accedi</h2>
+        <input type="text" id="login-user" class="auth-input" placeholder="Nome utente" autocomplete="username" />
+        <input type="password" id="login-pass" class="auth-input" placeholder="Password" autocomplete="current-password" />
+        <div class="auth-msg" id="login-msg"></div>
+        <button class="auth-btn auth-btn-primary" id="btn-login">Entra</button>
+        <button class="auth-btn auth-btn-ghost" id="btn-back-login">← Indietro</button>
+      </div>
+
+      <!-- Form Registrazione -->
+      <div id="auth-registra" class="auth-form" style="display:none">
+        <h2 class="auth-form-title">Registrati</h2>
+        <input type="text" id="reg-user" class="auth-input" placeholder="Nome utente" autocomplete="username" />
+        <input type="password" id="reg-pass" class="auth-input" placeholder="Password" autocomplete="new-password" />
+        <div class="auth-msg" id="reg-msg"></div>
+        <button class="auth-btn auth-btn-primary" id="btn-registra">Crea account</button>
+        <button class="auth-btn auth-btn-ghost" id="btn-back-reg">← Indietro</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  function mostraScelta()    { document.getElementById('auth-scelta').style.display   = ''; document.getElementById('auth-login').style.display    = 'none'; document.getElementById('auth-registra').style.display = 'none'; }
+  function mostraLogin()     { document.getElementById('auth-scelta').style.display   = 'none'; document.getElementById('auth-login').style.display    = ''; document.getElementById('auth-registra').style.display = 'none'; }
+  function mostraRegistra()  { document.getElementById('auth-scelta').style.display   = 'none'; document.getElementById('auth-login').style.display    = 'none'; document.getElementById('auth-registra').style.display = ''; }
+
+  function setMsg(id, testo, ok = false) {
+    const el = document.getElementById(id);
+    el.textContent = testo;
+    el.style.color = ok ? '#7fffb0' : '#ff7070';
+  }
+
+  // Navigazione
+  document.getElementById('btn-vai-login').addEventListener('click', mostraLogin);
+  document.getElementById('btn-vai-registra').addEventListener('click', mostraRegistra);
+  document.getElementById('btn-back-login').addEventListener('click', mostraScelta);
+  document.getElementById('btn-back-reg').addEventListener('click', mostraScelta);
+
+  // Ospite
+  document.getElementById('btn-ospite').addEventListener('click', () => {
+    overlay.remove();
+    onStart();
+  });
+
+  // Login
+  document.getElementById('btn-login').addEventListener('click', async () => {
+    const username = document.getElementById('login-user').value.trim();
+    const password = document.getElementById('login-pass').value;
+
+    // Validazione lato client
+    if (!username || !password) { setMsg('login-msg', 'Compila tutti i campi.'); return; }
+    if (username.length < 3)    { setMsg('login-msg', 'Nome utente troppo corto.'); return; }
+
+    setMsg('login-msg', 'Accesso in corso...', true);
+    const email = `${username}@sgrunf.game`;
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      const msg = error.message.toLowerCase();
+      // "user not found" — dallo stub DEV e da Supabase reale (invalid login credentials)
+      if (msg.includes('user not found') || msg.includes('invalid login') || msg.includes('no user') || msg.includes('not found')) {
+        setMsg('login-msg', 'Utente non trovato.');
+      } else if (msg.includes('invalid password') || msg.includes('wrong password') || msg.includes('credentials')) {
+        setMsg('login-msg', 'Password errata.');
+      } else {
+        setMsg('login-msg', 'Errore: ' + error.message);
+      }
+      return;
+    }
+    sessioneCorrente = data.session;
+    overlay.remove();
+    onStart();
+  });
+
+  // Registrazione
+  document.getElementById('btn-registra').addEventListener('click', async () => {
+    const username = document.getElementById('reg-user').value.trim();
+    const password = document.getElementById('reg-pass').value;
+
+    // Validazione lato client
+    if (!username || !password)  { setMsg('reg-msg', 'Compila tutti i campi.'); return; }
+    if (username.length < 3)     { setMsg('reg-msg', 'Nome utente minimo 3 caratteri.'); return; }
+    if (username.length > 20)    { setMsg('reg-msg', 'Nome utente massimo 20 caratteri.'); return; }
+    if (!/^[a-zA-Z0-9_]+$/.test(username)) { setMsg('reg-msg', 'Solo lettere, numeri e _ nel nome.'); return; }
+    if (password.length < 6)     { setMsg('reg-msg', 'Password minimo 6 caratteri.'); return; }
+
+    setMsg('reg-msg', 'Registrazione in corso...', true);
+    const email = `${username}@sgrunf.game`;
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { username } } });
+    if (error) {
+      const msg = error.message.toLowerCase();
+      if (msg.includes('already registered') || msg.includes('already exists') || error.status === 422) {
+        setMsg('reg-msg', 'Nome già in uso.');
+      } else {
+        setMsg('reg-msg', 'Errore: ' + error.message);
+      }
+      return;
+    }
+    // Sign-in automatico post-registrazione
+    const { data: loginData, error: loginErr } = await supabase.auth.signInWithPassword({ email, password });
+    if (!loginErr) sessioneCorrente = loginData.session;
+    else if (data.session) sessioneCorrente = data.session;
+    overlay.remove();
+    onStart();
+  });
+
+  // Enter su input
+  ['login-user','login-pass'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-login').click(); });
+  });
+  ['reg-user','reg-pass'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-registra').click(); });
+  });
+}
+
+/**
+ * Crea e mostra il bottone Esci (Logout) sovrapposto al canvas.
+ * Viene rimosso al logout o quando si avvia una nuova partita.
+ */
+function mostraBottoneLogout() {
+  rimuoviBottoneLogout();
+  if (!sessioneCorrente) return; // ospite: nessun bottone
+
+  const btn = document.createElement('button');
+  btn.id = 'btn-logout-overlay';
+  btn.textContent = 'Esci';
+  btn.addEventListener('click', async () => {
+    rimuoviBottoneLogout();
+    if (supabase) await supabase.auth.signOut();
+    sessioneCorrente = null;
+    classificaDati = null;
+    classificaStato = 'idle';
+    // Mostra di nuovo l'overlay auth e torna a START dopo
+    mostraOverlayAuth(() => {
+      caricaClassifica();
+      statoGioco = 'START';
+    });
+  });
+  document.body.appendChild(btn);
+}
+
+function rimuoviBottoneLogout() {
+  const b = document.getElementById('btn-logout-overlay');
+  if (b) b.remove();
+}
+
+
 
 /*
  * AUDIO ARCHITECTURE — due sistemi separati per tipo di suono:
@@ -1802,6 +2236,7 @@ function inizializzaParallax() {
 /** Inizializza e avvia una nuova partita */
 function avviaPartita() {
   statoGioco = 'PLAYING';
+  rimuoviBottoneLogout();
 
   // Reset punteggio e fisica
   punteggio = 0;
@@ -2073,22 +2508,32 @@ function disegnaHUD() {
   }
 }
 
-/** Disegna la schermata di avvio (titolo + istruzioni) */
+/** Disegna la schermata di avvio (titolo + istruzioni + classifica) */
 function disegnaStartScreen() {
   // Overlay semitrasparente scuro per far risaltare il testo
   ctx.fillStyle = 'rgba(10,5,0,0.60)';
   ctx.fillRect(0, 0, CW, CH);
 
-  testoFantasy('SGRUNF', CW / 2, CH / 2 - 80, '#ffd700', 72, 'center', 36);
-  testoFantasy('FANTASY RUNNER', CW / 2, CH / 2 - 20, '#f4e4a6', 36, 'center', 20);
-  testoFantasy('TOCCA  o  SPAZIO  per iniziare', CW / 2, CH / 2 + 40, '#e8d8a0', 22, 'center', 8);
-  testoFantasy('SALTO: tocco / barra spaziatrice', CW / 2, CH / 2 + 70, '#b89a5a', 18, 'center', 5);
+  // Titolo — spostato in alto per lasciare spazio alla classifica
+  testoFantasy('SGRUNF', CW / 2, 130, '#ffd700', 72, 'center', 36);
+  testoFantasy('FANTASY RUNNER', CW / 2, 190, '#f4e4a6', 36, 'center', 20);
+  testoFantasy('TOCCA  o  SPAZIO  per iniziare', CW / 2, 250, '#e8d8a0', 22, 'center', 8);
+  testoFantasy('SALTO: tocco / barra spaziatrice', CW / 2, 282, '#b89a5a', 18, 'center', 5);
 
   if (recordPersonale > 0) {
     testoFantasy(
-      `MIGLIOR PUNTEGGIO: ${Math.floor(recordPersonale)}`,
-      CW / 2, CH / 2 + 110, '#ffd700', 18, 'center', 10
+      `MIGLIOR PUNTEGGIO SESSIONE: ${Math.floor(recordPersonale)}`,
+      CW / 2, 316, '#ffd700', 16, 'center', 8
     );
+  }
+
+  // Classifica nella metà inferiore
+  disegnaClassifica(CW / 2, 370, 28);
+
+  // Nome utente in alto a destra se autenticato
+  if (sessioneCorrente) {
+    const nome = sessioneCorrente.user.user_metadata.username || '';
+    testoFantasy(`👤 ${nome}`, CW - 20, 46, '#a0e0ff', 18, 'right', 6);
   }
 
   // Avviso di rotazione per dispositivi in verticale
@@ -2096,24 +2541,39 @@ function disegnaStartScreen() {
   if (aspect < 1.2) {
     testoFantasy(
       '⟳ Ruota in orizzontale per un\'esperienza migliore',
-      CW / 2, CH - 20, '#886600', 16, 'center', 5
+      CW / 2, CH - 34, '#886600', 16, 'center', 5
     );
   }
+
+  // Crediti autori
+  testoFantasy('by Lorenzo Federici & Giovanni Fabrizi', CW / 2, CH - 18, '#b68e36', 14, 'center', 3);
 }
 
-/** Disegna la schermata Game Over con punteggio finale e record */
+/** Disegna la schermata Game Over con punteggio finale, record e classifica */
 function disegnaGameOver() {
   ctx.fillStyle = 'rgba(10,5,0,0.76)';
   ctx.fillRect(0, 0, CW, CH);
 
-  testoFantasy('GAME OVER', CW / 2, CH / 2 - 90, '#cc2200', 62, 'center', 36);
-  testoFantasy(`PUNTEGGIO: ${Math.floor(punteggio)}`, CW / 2, CH / 2 - 20, '#f4e4a6', 30, 'center', 16);
+  testoFantasy('GAME OVER', CW / 2, 120, '#cc2200', 62, 'center', 36);
+  testoFantasy(`PUNTEGGIO: ${Math.floor(punteggio)}`, CW / 2, 190, '#f4e4a6', 30, 'center', 16);
 
   if (punteggio >= recordPersonale && punteggio > 0) {
-    testoFantasy('✦ NUOVO RECORD! ✦', CW / 2, CH / 2 + 20, '#ffd700', 22, 'center', 18);
+    testoFantasy('✦ NUOVO RECORD! ✦', CW / 2, 230, '#ffd700', 22, 'center', 18);
   }
 
-  testoFantasy('TOCCA  o  SPAZIO  per riprovare', CW / 2, CH / 2 + 80, '#e8d8a0', 20, 'center', 10);
+  testoFantasy('TOCCA  o  SPAZIO  per riprovare', CW / 2, 270, '#e8d8a0', 20, 'center', 10);
+
+  // Classifica
+  disegnaClassifica(CW / 2, 320, 28);
+
+  // Nome utente in alto a destra
+  if (sessioneCorrente) {
+    const nome = sessioneCorrente.user.user_metadata.username || '';
+    testoFantasy(`👤 ${nome}`, CW - 20, 46, '#a0e0ff', 18, 'right', 6);
+  }
+
+  // Crediti autori
+  testoFantasy('by Lorenzo Federici & Giovanni Fabrizi', CW / 2, CH - 18, '#b68e36', 14, 'center', 3);
 }
 
 /** Disegna la schermata di caricamento con barra di progresso */
@@ -2304,7 +2764,14 @@ function update(timestamp) {
 
     if (player.morteFine) {
       if (punteggio > recordPersonale) recordPersonale = punteggio;
+      mostraBottoneLogout();
       statoGioco = 'GAMEOVER';
+      // Salva prima, poi ricarica la classifica — così il punteggio
+      // appena fatto è già nel database quando la classifica viene letta.
+      (async () => {
+        await salvaPunteggio(Math.floor(punteggio));
+        await caricaClassifica();
+      })();
     }
   }
 }
@@ -2378,30 +2845,61 @@ ctx.fillStyle = '#0a0800';
 ctx.fillRect(0, 0, CW, CH);
 testoFantasy('CARICAMENTO...', CW / 2, CH / 2, '#ffd700', 30, 'center', 20);
 
-// Avvia il caricamento degli asset; quando finisce, prepara il gioco
-caricaAsset(() => {
-  // Pre-renderizza tutti gli sprite e pre-calcola le hitbox statiche
-  prebuildSprites();
+/**
+ * Bootstrap asincrono:
+ *   1. Inizializza Supabase
+ *   2. Carica gli asset di gioco
+ *   3. Controlla se c'è già una sessione attiva
+ *   4. Se sì → START; se no → mostra overlay auth
+ */
+(async () => {
+  // Init Supabase (non bloccante: il gioco gira comunque in offline-mode)
+  await initSupabase();
 
-  // Scalda il font engine per evitare jank al primo fillText in-game
-  prewarmFont();
+  // Avvia il caricamento degli asset; quando finisce, prepara il gioco
+  caricaAsset(async () => {
+    // Pre-renderizza tutti gli sprite e pre-calcola le hitbox statiche
+    prebuildSprites();
 
-  /*
-   * Warm-up del pool: pre-alloca 4 istanze Obstacle durante il caricamento.
-   * Così i primi spawn in partita non causano allocazioni fresche → niente spike GC.
-   */
-  const POOL_WARMUP  = 4;
-  const tipiWarmup   = ['OstacoloFantasy1', 'OstacoloFantasy2',
-                        'OstacoloFantasy3', 'OstacoloFantasy1'];
-  for (let i = 0; i < POOL_WARMUP; i++) {
-    obstaclePool.push(new Obstacle(tipiWarmup[i]));
-  }
+    // Scalda il font engine per evitare jank al primo fillText in-game
+    prewarmFont();
 
-  inizializzaParallax();
-  player = new Player();
-  player.stato = STATO_ANIM.IDLE;
-  statoGioco = 'START';
-});
+    const POOL_WARMUP  = 4;
+    const tipiWarmup   = ['OstacoloFantasy1', 'OstacoloFantasy2',
+                          'OstacoloFantasy3', 'OstacoloFantasy1'];
+    for (let i = 0; i < POOL_WARMUP; i++) {
+      obstaclePool.push(new Obstacle(tipiWarmup[i]));
+    }
+
+    inizializzaParallax();
+    player = new Player();
+    player.stato = STATO_ANIM.IDLE;
+
+    // Controlla se esiste già una sessione persistita
+    let sessioneEsistente = null;
+    if (supabase) {
+      try {
+        const { data } = await supabase.auth.getSession();
+        sessioneEsistente = data.session || null;
+      } catch (_) {}
+    }
+
+    function avviaStart() {
+      caricaClassifica();
+      statoGioco = 'START';
+      mostraBottoneLogout();
+    }
+
+    if (sessioneEsistente) {
+      // Sessione attiva: salta l'overlay e vai direttamente a START
+      sessioneCorrente = sessioneEsistente;
+      avviaStart();
+    } else {
+      // Nessuna sessione: mostra overlay auth
+      mostraOverlayAuth(avviaStart);
+    }
+  });
+})();
 
 // Avvia il game loop (gira anche durante il caricamento per mostrare la barra di progresso)
 _rafHandle = requestAnimationFrame(ts => {
