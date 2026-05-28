@@ -4,10 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Sgrunf Fantasy</title>
-  
-  <link rel="stylesheet" href="fantasy.css">
-  <script src="fantasy.js" defer></script>
 
+  <link rel="stylesheet" href="fantasy.css">
+  <!--
+    type="module" è necessario per usare import() dinamico (Supabase SDK via CDN ESM).
+    Il defer è implicito nei moduli ES.
+  -->
+  <script type="module" src="fantasy.js"></script>
 </head>
 <body>
   <canvas id="gameCanvas"></canvas>
