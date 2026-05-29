@@ -410,6 +410,28 @@ async function salvaPunteggio(score) {
 }
 
 /**
+ * Carica il record personale dal database per l'utente corrente.
+ * Aggiorna recordPersonale se il valore in DB è superiore a quello in memoria.
+ * Silenzioso: errori solo in console.
+ */
+async function caricaRecordPersonale() {
+  if (!supabase || !sessioneCorrente) return;
+  try {
+    const { data, error } = await supabase
+      .from('leaderboard_fantasy')
+      .select('score')
+      .eq('user_id', sessioneCorrente.user.id)
+      .maybeSingle();
+    if (error) throw error;
+    if (data && data.score > recordPersonale) {
+      recordPersonale = data.score;
+    }
+  } catch (e) {
+    console.warn('[Supabase] caricaRecordPersonale:', e);
+  }
+}
+
+/**
  * Disegna la classifica sul canvas nell'area indicata.
  * @param {number} x        - X centro colonna posizione
  * @param {number} yInizio  - Y prima riga
@@ -617,9 +639,11 @@ function mostraBottoneLogout() {
     sessioneCorrente = null;
     classificaDati = null;
     classificaStato = 'idle';
+    recordPersonale = 0;
     // Mostra di nuovo l'overlay auth e torna a START dopo
     mostraOverlayAuth(() => {
       caricaClassifica();
+      caricaRecordPersonale();
       statoGioco = 'START';
     });
   });
@@ -2522,7 +2546,7 @@ function disegnaStartScreen() {
 
   if (recordPersonale > 0) {
     testoFantasy(
-      `MIGLIOR PUNTEGGIO SESSIONE: ${Math.floor(recordPersonale)}`,
+      `MIGLIOR PUNTEGGIO: ${Math.floor(recordPersonale)}`,
       CW / 2, 316, '#ffd700', 16, 'center', 8
     );
   }
@@ -2763,13 +2787,13 @@ function update(timestamp) {
     player.update(dt);
 
     if (player.morteFine) {
-      if (punteggio > recordPersonale) recordPersonale = punteggio;
       mostraBottoneLogout();
       statoGioco = 'GAMEOVER';
-      // Salva prima, poi ricarica la classifica — così il punteggio
-      // appena fatto è già nel database quando la classifica viene letta.
+      // Salva prima, poi ricarica classifica e record — così il punteggio
+      // appena fatto è già nel database quando vengono letti.
       (async () => {
         await salvaPunteggio(Math.floor(punteggio));
+        await caricaRecordPersonale();
         await caricaClassifica();
       })();
     }
@@ -2886,6 +2910,7 @@ testoFantasy('CARICAMENTO...', CW / 2, CH / 2, '#ffd700', 30, 'center', 20);
 
     function avviaStart() {
       caricaClassifica();
+      caricaRecordPersonale();
       statoGioco = 'START';
       mostraBottoneLogout();
     }
