@@ -32,6 +32,9 @@ SgrunfRunner is a browser-based endless runner game designed specifically for th
 ## 📁 Project Structure
 
 ```
+├── .github
+│   └── workflows
+│       └── keep-alive.yml
 ├── LICENSE
 ├── README.md
 ├── ModalitaCyberpunk
